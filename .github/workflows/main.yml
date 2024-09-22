@@ -1,1 +1,64 @@
+# .github/workflows/ci-cd-pipeline.yml
+
+name: FastAPI CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Change this if your main branch is named differently
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'  # Specify your Python version
+    
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run Tests
+      run: |
+        pytest  # Use this command if you're using pytest for testing
+
+  build_and_deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Build Application
+      run: |
+        # Add any build steps necessary for your FastAPI app
+        echo "Building FastAPI app..."
+
+    - name: Deploy to Render
+      env:
+        RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}  # Set this in GitHub Secrets
+        SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}  # Set this in GitHub Secrets
+      run: |
+        curl -X POST -H "Authorization: Bearer $RENDER_API_KEY" \
+        -H "Content-Type: application/json" \
+        -d '{"serviceId": "$SERVICE_ID", "clearCache": false}' \
+        https://api.render.com/v1/services/$SERVICE_ID/deploys
 

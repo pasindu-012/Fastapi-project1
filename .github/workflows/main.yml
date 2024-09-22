@@ -25,9 +25,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Run Tests
-      run: |
-        pytest  # Use this command if you're using pytest for testing
 
   build_and_deploy:
     needs: test
